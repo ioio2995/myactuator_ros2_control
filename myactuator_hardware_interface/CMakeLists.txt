@@ -15,27 +15,16 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic -Wno-implicit-fallthrough)
 endif()
 
+add_subdirectory(modules/myactuator_rmd)
+
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
-
-
-# Searching for myactuator_rmd SDK
-#https://github.com/2b-t/myactuator_rmd.git
-
-include_directories(
- "../../myactuator_rmd/include/"
-)
-
 
 ament_auto_add_library(
   myactuator_control SHARED
   src/myactuator_control.cpp
 )
-
-ament_target_dependencies(
-  myactuator_control
-  myactuator_rmd)
 
 ament_auto_add_library(
   ${PROJECT_NAME} SHARED

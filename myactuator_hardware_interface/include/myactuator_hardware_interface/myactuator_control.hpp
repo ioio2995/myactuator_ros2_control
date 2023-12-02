@@ -1,5 +1,4 @@
-// Copyright 2021 Factor Robotics
-//
+
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -15,8 +14,6 @@
 #pragma once
 
 #include <myactuator_rmd/driver.hpp>
-
-
 
 #include <cstring>
 #include <iostream>
@@ -38,11 +35,11 @@ typedef std::vector<uint8_t> bytes;
 
 namespace myactuator
 {
-class MyActuatorUSB
+class MyActuatorCAN
 {
 public:
-  MyActuatorUSB();
-  ~MyActuatorUSB();
+  MyActuatorCAN();
+  ~MyActuatorCAN();
 
   int init(const std::vector<std::vector<int64_t>> & serial_numbers);
 
