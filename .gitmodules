@@ -1,0 +1,6 @@
+[submodule "myactuator_hardware_interface/ext_libs"]
+	path = myactuator_hardware_interface/ext_libs
+	url = https://github.com/2b-t/myactuator_rmd.git
+[submodule "myactuator_hardware_interface/modules/myactuator_rmd"]
+	path = myactuator_hardware_interface/modules/myactuator_rmd
+	url = https://github.com/2b-t/myactuator_rmd.git
