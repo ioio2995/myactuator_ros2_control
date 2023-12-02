@@ -1,0 +1,9 @@
+<library path="myactuator_hardware_interface">
+  <class name="myactuator_hardware_interface/MyActuatorHardwareInterface"
+         type="myactuator_hardware_interface::MyActuatorHardwareInterface"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Myactuator plugin for ros2_control.
+    </description>
+  </class>
+</library>
