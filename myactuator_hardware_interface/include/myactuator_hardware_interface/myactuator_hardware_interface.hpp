@@ -21,7 +21,6 @@
 #include "myactuator_hardware_interface/visibility_control.hpp"
 #include "rclcpp/rclcpp.hpp"
 
-#include <myactuator_rmd/driver.hpp>
 
 #define AXIS_STATE_IDLE 1
 #define AXIS_STATE_CLOSED_LOOP_CONTROL 8

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.20)
 project(myactuator_hardware_interface)
 
 # Default to C99
@@ -15,10 +15,9 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic -Wno-implicit-fallthrough)
 endif()
 
-add_subdirectory(modules/myactuator_rmd)
-
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
+find_package(myactuator_rmd REQUIRED)
 ament_auto_find_build_dependencies()
 
 ament_auto_add_library(
@@ -29,6 +28,11 @@ ament_auto_add_library(
 ament_auto_add_library(
   ${PROJECT_NAME} SHARED
   src/myactuator_hardware_interface.cpp
+)
+
+
+target_link_libraries(myactuator_hardware_interface  
+  myactuator_rmd::myactuator_rmd
 )
 
 pluginlib_export_plugin_description_file(hardware_interface myactuator_hardware_interface.xml)

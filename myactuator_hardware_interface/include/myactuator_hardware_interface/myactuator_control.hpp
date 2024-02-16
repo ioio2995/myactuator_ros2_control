@@ -22,15 +22,6 @@
 
 myactuator_rmd::Driver rmd1("can0",1);
 
-#define MYACTUATOR_USB_VENDORID 0x1209
-#define MYACTUATOR_USB_PRODUCTID 0x0d32
-
-#define MYACTUATOR_OUT_ENDPOINT 0x03
-#define MYACTUATOR_IN_ENDPOINT 0x83
-
-#define MYACTUATOR_PROTOCOL_VERSION 1
-#define MYACTUATOR_MAX_PACKET_SIZE 16
-
 typedef std::vector<uint8_t> bytes;
 
 namespace myactuator
@@ -41,33 +32,10 @@ public:
   MyActuatorCAN();
   ~MyActuatorCAN();
 
-  int init(const std::vector<std::vector<int64_t>> & serial_numbers);
+  int init(const std::vector<std::vector<int64_t>> & can_numbers);
 
-  template <typename T>
-  int read(int64_t & serial_number, short endpoint_id, T & value);
-  template <typename T>
-  int write(int64_t & serial_number, short endpoint_id, const T & value);
-  int call(int64_t & serial_number, short endpoint_id);
 
 private:
-  libusb_context * libusb_context_;
-
-  std::map<int64_t, libusb_device_handle *> myactuator_map_;
-
-  short sequence_number_;
-
-  template <typename T>
-  int read(libusb_device_handle * myactuator_handle, short endpoint_id, T & value);
-  template <typename T>
-  int write(libusb_device_handle * myactuator_handle, short endpoint_id, const T & value);
-  int call(libusb_device_handle * myactuator_handle, short endpoint_id);
-
-  int endpointOperation(
-    libusb_device_handle * myactuator_handle, short endpoint_id, short response_size,
-    bytes request_payload, bytes & response_payload, bool MSB);
-
-  bytes encodePacket(
-    short sequence_number, short endpoint_id, short response_size, const bytes & request_payload);
-  bytes decodePacket(bytes & response_packet);
+ 
 };
 }  // namespace myactuator
