@@ -20,10 +20,6 @@ find_package(ament_cmake_auto REQUIRED)
 find_package(myactuator_rmd REQUIRED)
 ament_auto_find_build_dependencies()
 
-ament_auto_add_library(
-  myactuator_control SHARED
-  src/myactuator_control.cpp
-)
 
 ament_auto_add_library(
   ${PROJECT_NAME} SHARED
