@@ -15,13 +15,16 @@
 
 #include <cmath>
 
+// myactuator_rmd
+#include <myactuator_rmd/myactuator_rmd.hpp>
+
+// ROS
+#include "rclcpp/rclcpp.hpp"
+
+//ros2_control hardware_interface
 #include "hardware_interface/system_interface.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "myactuator_hardware_interface/visibility_control.hpp"
-#include "rclcpp/rclcpp.hpp"
-
-#include "myactuator_rmd/driver.hpp"
-
 
 #define HANDLE_TS_EXCEPTIONS(code_block)                                        \
   try                                                                           \
@@ -103,7 +106,7 @@ namespace myactuator_hardware_interface
     hardware_interface::return_type write(const rclcpp::Time &, const rclcpp::Duration &) override;
 
   private:
-    std::vector<myactuator_rmd::Driver> rdm_;
+    std::vector<myactuator_rmd::Actuator> rdm_;
     std::vector<std::string> ifname_;
     std::vector<std::uint32_t> can_id_;
 

@@ -75,7 +75,7 @@ namespace myactuator_hardware_interface
 
     for (size_t i = 0; i < info_.joints.size(); i++)
     {
-      HANDLE_TS_EXCEPTIONS(rdm_[i] = myactuator_rmd::Driver(ifname_[i], can_id_[i]));
+      HANDLE_TS_EXCEPTIONS(rdm_[i] = myactuator_rmd::Actuator(ifname_[i], can_id_[i]));
       HANDLE_TS_EXCEPTIONS(rdm_[i].setTimeout(timeout_[i]));
 
       HANDLE_TS_EXCEPTIONS(rdm_[i].setAcceleration(
