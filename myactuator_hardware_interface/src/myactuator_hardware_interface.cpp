@@ -75,7 +75,9 @@ namespace myactuator_hardware_interface
 
     for (size_t i = 0; i < info_.joints.size(); i++)
     {
-      HANDLE_TS_EXCEPTIONS(rdm_[i] = myactuator_rmd::Actuator(ifname_[i], can_id_[i]));
+      HANDLE_TS_EXCEPTIONS(driver_[i] = ifname_[i]);
+      HANDLE_TS_EXCEPTIONS(rdm_.emplace_back(driver_[i], can_id_[i]));
+      
       HANDLE_TS_EXCEPTIONS(rdm_[i].setTimeout(timeout_[i]));
 
       HANDLE_TS_EXCEPTIONS(rdm_[i].setAcceleration(
@@ -90,6 +92,7 @@ namespace myactuator_hardware_interface
       HANDLE_TS_EXCEPTIONS(rdm_[i].setAcceleration(
         velocity_deceleration_[i], 
         myactuator_rmd::AccelerationType::VELOCITY_PLANNING_DECELERATION ));
+
       HANDLE_TS_EXCEPTIONS(rdm_[i].setControllerGains(
         gains_[i]));
     }
@@ -129,6 +132,9 @@ namespace myactuator_hardware_interface
           info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_velocitie_[i]));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_position_[i]));
+      
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+          info_.joints[i].name, "motor_error", &hw_motor_errors_[i]));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, "motor_error", &hw_motor_errors_[i]));
       state_interfaces.emplace_back(hardware_interface::StateInterface(

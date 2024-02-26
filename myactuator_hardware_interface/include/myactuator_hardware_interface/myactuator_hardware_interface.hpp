@@ -106,8 +106,9 @@ namespace myactuator_hardware_interface
     hardware_interface::return_type write(const rclcpp::Time &, const rclcpp::Duration &) override;
 
   private:
-    std::vector<myactuator_rmd::Actuator> rdm_;
-    std::vector<std::string> ifname_;
+    std::vector<myactuator_rmd::CanDriver> driver_;
+    std::vector<myactuator_rmd::ActuatorInterface> rdm_;
+    std::vector<std::string>  ifname_;
     std::vector<std::uint32_t> can_id_;
 
     std::vector<double> hw_commands_position_;
