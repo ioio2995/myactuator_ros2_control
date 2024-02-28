@@ -2,7 +2,7 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <xacro:macro name="myactuator_ros2_control"
-    params="name serial_number:=^|000000000000 enable_joint0:=^|true enable_joint1:=^|true joint0_name:=^|joint0 joint1_name:=^|joint1">
+    params="name enable_joint0:=^|true enable_joint1:=^|true joint0_name:=^|joint0 joint1_name:=^|joint1">
 
     <ros2_control name="${name}" type="system">
       <hardware>
