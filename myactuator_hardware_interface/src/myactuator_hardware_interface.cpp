@@ -27,32 +27,41 @@ namespace myactuator_hardware_interface
     {
       return CallbackReturn::ERROR;
     }
+    torque_constant_.resize(info_.joints.size(), std::numeric_limits<float>::quiet_NaN());
+    reducer_ratio_.resize(info_.joints.size(), std::numeric_limits<float>::quiet_NaN());
+    speed_constant_.resize(info_.joints.size(), std::numeric_limits<float>::quiet_NaN());
+    rotor_inertia_.resize(info_.joints.size(), std::numeric_limits<float>::quiet_NaN());
 
-
-    hw_motor_temperature_.resize(info_.sensors.size(), std::numeric_limits<std::uint16_t>::quiet_NaN());
+    hw_motor_temperature_.resize(info_.joints.size(), std::numeric_limits<std::uint16_t>::quiet_NaN());
     hw_uptime_.resize(info_.joints.size(), std::chrono::milliseconds(0));
 
     hw_voltage_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-    hw_current_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
-    
     hw_current_phase_a_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
     hw_current_phase_b_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
     hw_current_phase_c_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
-    hw_speed_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-    hw_angle_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+    hw_velocitie_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+    hw_position_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+    hw_effort_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+    hw_commands_position_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+    hw_commands_velocitie_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+    hw_commands_effort_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
     hw_brake_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
     hw_motor_errors_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+
     
 
     for (const hardware_interface::ComponentInfo &joint : info_.joints)
     {
       can_id_.emplace_back(std::stoi(joint.parameters.at("can_id")));
-      ifname_.emplace_back(joint.parameters.at("ifname"));
       timeout_.emplace_back(std::stoi(joint.parameters.at("timeout")));
+      torque_constant_.emplace_back(std::stoi(joint.parameters.at("torque_constant")));
+      reducer_ratio_.emplace_back(std::stoi(joint.parameters.at("reducer_ratio")));
+      speed_constant_.emplace_back(std::stoi(joint.parameters.at("speed_constant")));
+      rotor_inertia_.emplace_back(std::stoi(joint.parameters.at("rotor_inertia")));
       position_acceleration_.emplace_back(std::stoi(joint.parameters.at("position_acceleration")));
       position_deceleration_.emplace_back(std::stoi(joint.parameters.at("position_deceleration")));
       velocity_acceleration_.emplace_back(std::stoi(joint.parameters.at("velocity_acceleration")));
@@ -73,10 +82,12 @@ namespace myactuator_hardware_interface
       );
     }
 
+    ifname_ = info_.hardware_parameters["ifname"];
+    HANDLE_TS_EXCEPTIONS(driver_.emplace_back(ifname_));
+
     for (size_t i = 0; i < info_.joints.size(); i++)
     {
-      HANDLE_TS_EXCEPTIONS(driver_[i] = ifname_[i]);
-      HANDLE_TS_EXCEPTIONS(rdm_.emplace_back(driver_[i], can_id_[i]));
+      HANDLE_TS_EXCEPTIONS(rdm_.emplace_back(driver_.back(), can_id_[i]));
       
       HANDLE_TS_EXCEPTIONS(rdm_[i].setTimeout(timeout_[i]));
 
@@ -96,6 +107,7 @@ namespace myactuator_hardware_interface
       HANDLE_TS_EXCEPTIONS(rdm_[i].setControllerGains(
         gains_[i]));
     }
+
     control_level_.resize(info_.joints.size(), integration_level_t::UNDEFINED);
     return CallbackReturn::SUCCESS;
   }
@@ -132,17 +144,12 @@ namespace myactuator_hardware_interface
           info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_velocitie_[i]));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_position_[i]));
-      
-      state_interfaces.emplace_back(hardware_interface::StateInterface(
-          info_.joints[i].name, "motor_error", &hw_motor_errors_[i]));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, "motor_error", &hw_motor_errors_[i]));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, "motor_temperature", &hw_motor_temperature_[i]));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, "motor_voltage", &hw_voltage_[i]));
-      state_interfaces.emplace_back(hardware_interface::StateInterface(
-          info_.joints[i].name, "motor_current", &hw_current_[i]));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, "motor_phase_a_current", &hw_current_phase_a_[i]));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
@@ -277,17 +284,18 @@ namespace myactuator_hardware_interface
       myactuator_rmd::MotorStatus1 MotorStatus_1;
       myactuator_rmd::MotorStatus2 MotorStatus_2;
       myactuator_rmd::MotorStatus3 MotorStatus_3;
-      
+
       HANDLE_RW_EXCEPTIONS(MotorStatus_1=rdm_[i].getMotorStatus1());
       hw_motor_temperature_[i] = MotorStatus_1.temperature;
       hw_voltage_[i] = static_cast<double>(MotorStatus_1.voltage * 1000);
       hw_motor_errors_[i] = static_cast<int>(MotorStatus_1.error_code);
 
       HANDLE_RW_EXCEPTIONS(MotorStatus_2=rdm_[i].getMotorStatus2());
-      hw_current_[i] = static_cast<double>(MotorStatus_2.current * 1000);
+      hw_effort_[i] = static_cast<double>(MotorStatus_2.current)*torque_constant_[i];
       hw_position_[i] = static_cast<double>(MotorStatus_2.shaft_angle * M_PI / 180);
-      hw_speed_[i] = static_cast<double>(MotorStatus_2.shaft_speed * 2 * M_PI);
-    
+     hw_velocitie_[i] = static_cast<double>(MotorStatus_2.shaft_speed * 2 * M_PI);
+
+      
       HANDLE_RW_EXCEPTIONS(MotorStatus_3=rdm_[i].getMotorStatus3());
       hw_current_phase_a_[i] = static_cast<double>(MotorStatus_3.current_phase_a * 1000);
       hw_current_phase_b_[i] = static_cast<double>(MotorStatus_3.current_phase_b * 1000);

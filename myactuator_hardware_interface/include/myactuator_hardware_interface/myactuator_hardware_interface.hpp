@@ -106,10 +106,11 @@ namespace myactuator_hardware_interface
     hardware_interface::return_type write(const rclcpp::Time &, const rclcpp::Duration &) override;
 
   private:
+    std::string ifname_;
     std::vector<myactuator_rmd::CanDriver> driver_;
-    std::vector<myactuator_rmd::ActuatorInterface> rdm_;
-    std::vector<std::string>  ifname_;
+    
     std::vector<std::uint32_t> can_id_;
+    std::vector<myactuator_rmd::ActuatorInterface> rdm_;
 
     std::vector<double> hw_commands_position_;
     std::vector<double> hw_commands_velocitie_;
@@ -125,24 +126,19 @@ namespace myactuator_hardware_interface
     std::vector<myactuator_rmd::Gains> gains_;
 
     std::vector<float> torque_constant_;
+    std::vector<float> reducer_ratio_;
+    std::vector<float> speed_constant_;
+    std::vector<float> rotor_inertia_ ;
 
     std::vector<std::chrono::milliseconds> timeout_;
 
     std::vector<double> hw_motor_temperature_;
     std::vector<std::chrono::milliseconds> hw_uptime_;
-
     std::vector<double> hw_voltage_;
-    std::vector<double> hw_current_;
-
     std::vector<double> hw_current_phase_a_;
     std::vector<double> hw_current_phase_b_;
     std::vector<double> hw_current_phase_c_;
-
-    std::vector<double> hw_speed_;
-    std::vector<double> hw_angle_;
-
     std::vector<double> hw_brake_;
-
     std::vector<double> hw_motor_errors_;
 
     enum class integration_level_t : int32_t
