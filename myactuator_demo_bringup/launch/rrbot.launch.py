@@ -1,4 +1,4 @@
-# Copyright 2021 Factor Robotics
+# Copyright 2024 Lionel ORCIL - github.com/ioio2995
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,49 +13,30 @@
 # limitations under the License.
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, RegisterEventHandler
 from launch.conditions import IfCondition
+from launch.event_handlers import OnProcessExit
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
+
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
+    # Declare arguments
     declared_arguments = []
-
     declared_arguments.append(
         DeclareLaunchArgument(
-            "enable_joint0",
+            "gui",
             default_value="true",
+            description="Start RViz2 automatically with this launch file.",
         )
     )
 
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            "enable_joint1",
-            default_value="false",
-        )
-    )
+    # Initialize Arguments
+    gui = LaunchConfiguration("gui")
 
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            "joint0_controller",
-            default_value="joint0_velocity_controller",
-        )
-    )
-
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            "joint1_controller",
-            default_value="joint1_velocity_controller",
-        )
-    )
-
-    enable_joint0 = LaunchConfiguration("enable_joint0")
-    enable_joint1 = LaunchConfiguration("enable_joint1")
-    joint0_controller = LaunchConfiguration("joint0_controller")
-    joint1_controller = LaunchConfiguration("joint1_controller")
-
+    # Get URDF via xacro
     robot_description_content = Command(
         [
             PathJoinSubstitution([FindExecutable(name="xacro")]),
@@ -64,15 +45,9 @@ def generate_launch_description():
                 [
                     FindPackageShare("myactuator_demo_description"),
                     "urdf",
-                    "myactuator.urdf.xacro",
+                    "rrbot.urdf.xacro",
                 ]
             ),
-            " ",
-            "enable_joint0:=",
-            enable_joint0,
-            " ",
-            "enable_joint1:=",
-            enable_joint1,
         ]
     )
     robot_description = {"robot_description": robot_description_content}
@@ -81,17 +56,23 @@ def generate_launch_description():
         [
             FindPackageShare("myactuator_demo_bringup"),
             "config",
-            "myactuator_multi_interface_forward_controllers.yaml",
+            "rrbot_controllers.yaml",
         ]
+    )
+    rviz_config_file = PathJoinSubstitution(
+        [FindPackageShare("ros2_control_demo_description"), "rrbot/rviz", "rrbot.rviz"]
     )
 
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
+        parameters=[robot_controllers],
         output="both",
-        parameters=[robot_description, robot_controllers],
+        remappings=[
+            ("~/robot_description", "/robot_description"),
+        ],
     )
-
+    
     robot_state_pub_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
@@ -99,32 +80,49 @@ def generate_launch_description():
         parameters=[robot_description],
     )
 
+    rviz_node = Node(
+        package="rviz2",
+        executable="rviz2",
+        name="rviz2",
+        output="log",
+        arguments=["-d", rviz_config_file],
+        condition=IfCondition(gui),
+    )
+
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["joint_state_broadcaster", "-c", "/controller_manager"],
+        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
     )
 
-    joint0_controller_spawner = Node(
+    robot_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=[joint0_controller, "-c", "/controller_manager"],
-        condition=IfCondition(enable_joint0),
+        arguments=["forward_position_controller", "--controller-manager", "/controller_manager"],
     )
 
-    joint1_controller_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=[joint1_controller, "-c", "/controller_manager"],
-        condition=IfCondition(enable_joint1),
+    # Delay rviz start after `joint_state_broadcaster`
+    delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=joint_state_broadcaster_spawner,
+            on_exit=[rviz_node],
+        )
+    )
+
+    # Delay start of robot_controller after `joint_state_broadcaster`
+    delay_robot_controller_spawner_after_joint_state_broadcaster_spawner = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=joint_state_broadcaster_spawner,
+            on_exit=[robot_controller_spawner],
+        )
     )
 
     nodes = [
         control_node,
         robot_state_pub_node,
         joint_state_broadcaster_spawner,
-        joint0_controller_spawner,
-        joint1_controller_spawner,
+        delay_rviz_after_joint_state_broadcaster_spawner,
+        delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
     ]
 
     return LaunchDescription(declared_arguments + nodes)

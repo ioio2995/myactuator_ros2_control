@@ -1,4 +1,5 @@
-
+// Copyright 2024 Lionel ORCIL - github.com/ioio2995
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -67,7 +68,7 @@
     RCLCPP_ERROR(rclcpp::get_logger(APP_MODULE), "Driver Exception");           \
     return hardware_interface::return_type::ERROR;                              \
   }
-
+  
 namespace myactuator_hardware_interface
 {
   class MyActuatorHardwareInterface : public hardware_interface::SystemInterface 
@@ -80,6 +81,9 @@ namespace myactuator_hardware_interface
 
     MYACTUATOR_HARDWARE_INTERFACE_PUBLIC
     CallbackReturn on_activate(const rclcpp_lifecycle::State &) override;
+
+    MYACTUATOR_HARDWARE_INTERFACE_PUBLIC
+    CallbackReturn on_configure(const rclcpp_lifecycle::State &) override;
 
     MYACTUATOR_HARDWARE_INTERFACE_PUBLIC
     CallbackReturn on_deactivate(const rclcpp_lifecycle::State &) override;
@@ -96,10 +100,6 @@ namespace myactuator_hardware_interface
         const std::vector<std::string> &stop_interfaces) override;
 
     MYACTUATOR_HARDWARE_INTERFACE_PUBLIC
-    hardware_interface::return_type perform_command_mode_switch(
-        const std::vector<std::string> &, const std::vector<std::string> &) override;
-
-    MYACTUATOR_HARDWARE_INTERFACE_PUBLIC
     hardware_interface::return_type read(const rclcpp::Time &, const rclcpp::Duration &) override;
 
     MYACTUATOR_HARDWARE_INTERFACE_PUBLIC
@@ -112,34 +112,34 @@ namespace myactuator_hardware_interface
     std::vector<std::uint32_t> can_id_;
     std::vector<myactuator_rmd::ActuatorInterface> rdm_;
 
-    std::vector<double> hw_commands_position_;
-    std::vector<double> hw_commands_velocitie_;
-    std::vector<double> hw_commands_effort_;
-    std::vector<double> hw_position_;
-    std::vector<double> hw_velocitie_;
-    std::vector<double> hw_effort_;
+    std::uint32_t motors_max_speed_ ;
+    std::chrono::milliseconds motors_timeout_;
 
-    std::vector<std::uint32_t> position_acceleration_;
-    std::vector<std::uint32_t> position_deceleration_;
-    std::vector<std::uint32_t> velocity_acceleration_;
-    std::vector<std::uint32_t> velocity_deceleration_;
-    std::vector<myactuator_rmd::Gains> gains_;
-
-    std::vector<float> torque_constant_;
-    std::vector<float> reducer_ratio_;
-    std::vector<float> speed_constant_;
-    std::vector<float> rotor_inertia_ ;
-
-    std::vector<std::chrono::milliseconds> timeout_;
+    std::vector<double> hw_commands_positions_;
+    std::vector<double> hw_commands_velocities_;
+    std::vector<double> hw_commands_efforts_;
+    std::vector<double> hw_states_positions_;
+    std::vector<double> hw_states_velocities_;
+    std::vector<double> hw_states_efforts_;
 
     std::vector<double> hw_motor_temperature_;
-    std::vector<std::chrono::milliseconds> hw_uptime_;
     std::vector<double> hw_voltage_;
     std::vector<double> hw_current_phase_a_;
     std::vector<double> hw_current_phase_b_;
     std::vector<double> hw_current_phase_c_;
     std::vector<double> hw_brake_;
     std::vector<double> hw_motor_errors_;
+    
+    std::vector<std::uint32_t> motor_position_acceleration_;
+    std::vector<std::uint32_t> motor_position_deceleration_;
+    std::vector<std::uint32_t> motor_velocity_acceleration_;
+    std::vector<std::uint32_t> motor_velocity_deceleration_;
+    std::vector<myactuator_rmd::Gains> motor_gains_;
+
+    std::vector<double> motor_torque_constant_;
+    std::vector<double> motor_reducer_ratio_;
+    std::vector<double> motor_speed_constant_;
+    std::vector<double> motor_rotor_inertia_ ;
 
     enum class integration_level_t : int32_t
     {

@@ -19,20 +19,19 @@ diffbot_base_controller:
 
     wheel_separation_multiplier: 1.0
     left_wheel_radius_multiplier: 1.0
-    right_wheel_radius_multiplier: 1.0
+    right_wheel_radius_multiplier: -1.0
 
-    publish_rate: 100.0
+    publish_rate: 50.0
     odom_frame_id: odom
     base_frame_id: base_link
     pose_covariance_diagonal : [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
     twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
 
-    open_loop: false
+    open_loop: true
     enable_odom_tf: true
 
     cmd_vel_timeout: 0.5
     #publish_limited_velocity: true
-    use_stamped_vel: false
     #velocity_rolling_window_size: 10
 
     # Velocity and acceleration limits
