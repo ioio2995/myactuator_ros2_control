@@ -3,13 +3,17 @@
 <package format="3">
   <name>myactuator_demo_description</name>
   <version>0.1.0</version>
-  <description>myactuator ros2_control description</description>
+  <description>Description (urdf) files and RVIZ configurations for Myactuator RMD Motors</description>
  <maintainer email="orcil.lione@gmail.coml">Orcil Lionel</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
   <exec_depend>ros2_control_demo_description</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

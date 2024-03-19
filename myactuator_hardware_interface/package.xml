@@ -3,7 +3,7 @@
 <package format="3">
   <name>myactuator_hardware_interface</name>
   <version>0.1.0</version>
-  <description>Myactuator hardware interface</description>
+  <description>ROS Control hardware interface implementation for Myactuator RMD Motors</description>
   <maintainer email="orcil.lione@gmail.coml">Orcil Lionel</maintainer>
   <license>Apache-2.0</license>
 
@@ -13,6 +13,7 @@
   <depend>myactuator_rmd</depend>
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
+  <depend>myactuator_rmd</>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
