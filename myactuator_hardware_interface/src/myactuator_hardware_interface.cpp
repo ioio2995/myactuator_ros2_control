@@ -180,7 +180,11 @@ namespace myactuator_hardware_interface
       const std::vector<std::string> &stop_interfaces)
   {
     RCLCPP_INFO(rclcpp::get_logger(APP_MODULE), "Mode Switch.. please wait a moment...");
-    std::vector<integration_level_t> new_modes = {};
+    std::vector<integration_level_t> new_modes;
+    std::vector<bool> new_switch;
+    new_modes.resize(info_.joints.size(), integration_level_t::UNDEFINED);
+    new_switch.resize(info_.joints.size(), false);
+
 
     // Set command modes for starting interfaces
     for (std::string key : start_interfaces)
@@ -189,15 +193,18 @@ namespace myactuator_hardware_interface
       {
         if (key == info_.joints[i].name + "/" + hardware_interface::HW_IF_POSITION)
         {
-          new_modes.push_back(integration_level_t::POSITION);
+          new_modes[i] = integration_level_t::POSITION ;
+          new_switch[i] = true ;
         }
         if (key == info_.joints[i].name + "/" + hardware_interface::HW_IF_VELOCITY)
         {
-          new_modes.push_back(integration_level_t::VELOCITY);
+          new_modes[i] = integration_level_t::VELOCITY;
+          new_switch[i] = true ;
         }
         if (key == info_.joints[i].name + "/" + hardware_interface::HW_IF_EFFORT)
         {
-          new_modes.push_back(integration_level_t::EFFORT);
+          new_modes[i] = integration_level_t::EFFORT;
+          new_switch[i] = true ;
         }
       }
     }
@@ -209,22 +216,27 @@ namespace myactuator_hardware_interface
       {
         hw_commands_velocities_[i] = 0;
         hw_commands_efforts_[i] = 0;
-        new_modes.push_back(integration_level_t::UNDEFINED);
+        new_modes[i] = integration_level_t::UNDEFINED;
+        new_switch[i] = true ;
       }
     }
 
     // Set the new command modes
     for (std::size_t i = 0; i < info_.joints.size(); i++)
     {
-      if (new_modes[i] != integration_level_t::UNDEFINED)
-     {
-        if (control_level_[i] != integration_level_t::UNDEFINED)
+      if (new_switch[i] != false)
+      {
+        if (new_modes[i] != integration_level_t::UNDEFINED)
         {
-          // Something else is using the joint! Abort!
-          return hardware_interface::return_type::ERROR;
+          if (control_level_[i] != integration_level_t::UNDEFINED)
+          {
+            // Something else is using the joint! Abort!
+            std::cerr << "Error: Joint " << i << ": Control level already defined. Aborting..." << std::endl;
+            return hardware_interface::return_type::ERROR;
+          }
         }
-     } 
-      control_level_[i] = new_modes[i];
+        control_level_[i] = new_modes[i];
+      }
     }
     return hardware_interface::return_type::OK;
   }
