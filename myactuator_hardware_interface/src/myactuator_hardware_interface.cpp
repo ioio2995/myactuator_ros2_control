@@ -80,6 +80,13 @@ namespace myactuator_hardware_interface
     for (size_t i = 0; i < info_.joints.size(); i++)
     {
       HANDLE_TS_EXCEPTIONS(rdm_.emplace_back(driver_.back(), can_id_[i]));
+      HANDLE_TS_EXCEPTIONS(rdm_[i].setTimeout(std::chrono::milliseconds(0)));
+      HANDLE_TS_EXCEPTIONS(rdm_[i].setCurrentPositionAsEncoderZero());
+      HANDLE_TS_EXCEPTIONS(rdm_[i].reset());
+      rclcpp::sleep_for(std::chrono::seconds(1));
+    }
+    for (size_t i = 0; i < info_.joints.size(); i++)
+    {
       HANDLE_TS_EXCEPTIONS(rdm_[i].setControllerGains(motor_gains_[i], true));
       HANDLE_TS_EXCEPTIONS(rdm_[i].setAcceleration(
           motor_position_acceleration_[i],
