@@ -21,44 +21,39 @@ This project provides a ROS 2 driver for the MyActuator RMD X-series servo motor
 
 ## Installation
 
-1. Clone the repository:
+1. Create a ROS 2 workspace and navigate into it:
+   ```bash
+   mkdir -p ~/ros2_ws/src/myactuator
+   cd ~/ros2_ws/src/myactuator
+   ```
+
+2. Clone the repository into the workspace:
    ```bash
    git clone https://github.com/ioio2995/myactuator_ros2_control.git
-   cd myactuator_ros2_control
+   git clone https://github.com/2b-t/myactuator_rmd.git
+   cd ../..
    ```
 
-2. Create a ROS 2 workspace and navigate into it:
-   ```bash
-   mkdir -p ~/ros2_ws/src
-   cd ~/ros2_ws/src
-   ```
-
-3. Clone the repository into the workspace:
-   ```bash
-   git clone https://github.com/ioio2995/myactuator_ros2_control.git
-   cd ..
-   ```
-
-4. Install ROS 2 dependencies:
+3. Install ROS 2 dependencies:
    ```bash
    sudo apt update
    rosdep update
    rosdep install --from-paths src --ignore-src -r -y
    ```
 
-5. Install Python dependencies:
+4. Install Python dependencies:
    ```bash
    cd src/myactuator_ros2_control
    pip install -r requirements.txt
    cd ../..
    ```
 
-6. Build the workspace:
+5. Build the workspace:
    ```bash
    colcon build
    ```
 
-7. Source the setup script:
+6. Source the setup script:
    ```bash
    source install/setup.bash
    ```
