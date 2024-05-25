@@ -5,7 +5,7 @@
   <version>0.1.0</version>
   <description>Launch files and configurations for Myactuator RMD Motors</description>
   <maintainer email="orcil.lione@gmail.coml">Orcil Lionel</maintainer>
-  <license>Apache-2.0</license>
+  <license>MIT</license>
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
