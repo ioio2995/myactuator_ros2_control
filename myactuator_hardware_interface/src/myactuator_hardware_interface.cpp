@@ -73,6 +73,7 @@ namespace myactuator_hardware_interface
     }
     for (size_t i = 0; i < info_.joints.size(); i++)
     {
+      HANDLE_TS_EXCEPTIONS(rdm_[i].releaseBrake());
       HANDLE_TS_EXCEPTIONS(rdm_[i].setControllerGains(motor_gains_[i], true));
       HANDLE_TS_EXCEPTIONS(rdm_[i].setAcceleration(
           motor_position_acceleration_[i],
