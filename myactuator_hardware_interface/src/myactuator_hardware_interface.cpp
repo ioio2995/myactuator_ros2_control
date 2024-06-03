@@ -21,7 +21,6 @@ namespace myactuator_hardware_interface
     hw_commands_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
     hw_commands_efforts_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
     control_level_.resize(info_.joints.size(), integration_level_t::UNDEFINED);
-    initial_angle_offsets_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
     hw_motor_temperature_.resize(info_.joints.size(), std::numeric_limits<std::uint16_t>::quiet_NaN());
     hw_voltage_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
@@ -56,7 +55,6 @@ namespace myactuator_hardware_interface
           myactuator_rmd::PiGains(
               std::stoi(joint.parameters.at("kp_position")),
               std::stoi(joint.parameters.at("ki_position"))));
-      initial_angle_offsets_.emplace_back(std::stoi(joint.parameters.at("initial_angle_offset")));
     }
     return CallbackReturn::SUCCESS;
   }
@@ -106,7 +104,6 @@ namespace myactuator_hardware_interface
       if (std::isnan(hw_commands_positions_[i])) hw_commands_positions_[i] = 0;
       if (std::isnan(hw_commands_velocities_[i])) hw_commands_velocities_[i] = 0;
       if (std::isnan(hw_commands_efforts_[i])) hw_commands_efforts_[i] = 0;
-      if (std::isnan(initial_angle_offsets_[i])) initial_angle_offsets_[i] = 0;
       control_level_[i] = integration_level_t::UNDEFINED;
     }
 
@@ -251,7 +248,7 @@ namespace myactuator_hardware_interface
       HANDLE_RW_EXCEPTIONS(MotorStatus_2 = rdm_[i].getMotorStatus2());
       HANDLE_RW_EXCEPTIONS(MotorStatus_3 = rdm_[i].getMotorStatus3());
 
-      hw_states_positions_[i] = static_cast<double>(((MultiTurnAngle * M_PI) / 180) - initial_angle_offsets_[i]);
+      hw_states_positions_[i] = static_cast<double>(((MultiTurnAngle * M_PI) / 180));
       hw_states_efforts_[i] = static_cast<double>(MotorStatus_2.current * motor_torque_constant_[i]);
       hw_states_velocities_[i] = static_cast<double>((MotorStatus_2.shaft_speed * M_PI) / 180);
       hw_motor_errors_[i] = static_cast<int>(MotorStatus_1.error_code);
@@ -273,7 +270,7 @@ namespace myactuator_hardware_interface
       switch (control_level_[i])
       {
       case integration_level_t::POSITION:
-        input_pos = (((hw_commands_positions_[i] * 180) / M_PI) - initial_angle_offsets_[i]);
+        input_pos = (((hw_commands_positions_[i] * 180) / M_PI));
         HANDLE_RW_EXCEPTIONS(rdm_[i].sendPositionAbsoluteSetpoint(input_pos, motors_max_speed_));
         break;
       case integration_level_t::VELOCITY:

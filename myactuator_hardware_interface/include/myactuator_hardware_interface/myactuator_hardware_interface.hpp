@@ -126,8 +126,6 @@ namespace myactuator_hardware_interface
     std::vector<double> motor_reducer_ratio_;
     std::vector<double> motor_speed_constant_;
     std::vector<double> motor_rotor_inertia_ ;
-    
-    std::vector<double> initial_angle_offsets_;
 
     enum class integration_level_t : int32_t
     {
