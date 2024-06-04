@@ -1,0 +1,9 @@
+<library path="myactuator_controllers">
+  <class name="myactuator_controllers/MyActuatorBroadcaster"
+         type="myactuator_controllers::MyActuatorBroadcaster"
+         base_class_type="controller_interface::ControllerInterface">
+    <description>
+      Myactuator plugin for ros2_control.
+    </description>
+  </class>
+</library>
