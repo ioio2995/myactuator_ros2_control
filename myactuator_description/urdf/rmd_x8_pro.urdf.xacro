@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <link name="body_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${0.098/2}" length="0.027" />
+            </geometry>
+            <origin xyz="0 0 ${0.027/2}" rpy="0 0 0" />
+            <material name="blue" />
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="${0.098/2}" length="0.027" />
+            </geometry>
+            <origin xyz="0 0 ${0.027/2}" rpy="0 0 0" />
+        </collision>
+        <xacro:cylinder_inertia m="0.600" r="${0.098/2}"
+            h="0.027"
+            xyz="0 0 ${0.027/2}" rpy="0 0 0" />
+    </link>
+
+    <link name="cover_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${0.06/2}" length="0.012" />
+            </geometry>
+            <origin xyz="0 0 -${0.012/2}" rpy="0 0 0" />
+            <material name="blue" />
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="${0.06/2}" length="0.012" />
+            </geometry>
+            <origin xyz="0 0 -${0.012/2}" rpy="0 0 0" />
+        </collision>
+        <xacro:cylinder_inertia m="0.01" r="${0.06/2}"
+            h="0.012"
+            xyz="0 0 -${0.012/2}" rpy="0 0 0" />
+    </link>
+
+    <link name="shaft_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${0.042/2}" length="0.0035" />
+            </geometry>
+            <origin xyz="0 0 ${0.0035/2}" rpy="0 0 0" />
+            <material name="blue" />
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="${0.098/2}" length="0.0035" />
+            </geometry>
+            <origin xyz="0 0 ${0.0035/2}" rpy="0 0 0" />
+        </collision>
+        <xacro:cylinder_inertia m="0.1" r="${0.098/2}"
+            h="0.0035"
+            xyz="0 0 ${0.0035/2}" rpy="0 0 0" />
+    </link>
+
+    <link name="arm_link">
+        <visual>
+            <geometry>
+                <box size="0.042 0.15 0.01" />
+            </geometry>
+            <origin xyz="0 ${(0.15/2)-(0.042/2)} ${0.01/2}" rpy="0 0 0" />
+            <material name="blue" />
+        </visual>
+        <collision>
+            <geometry>
+                <box size="0.042 0.15 0.01" />
+            </geometry>
+            <origin xyz="0 ${(0.15/2)-(0.042/2)} ${0.01/2}" rpy="0 0 0" />
+        </collision>
+        <xacro:box_inertia m="0.2" l="0.042" w="0.15" h="0.01" xyz="0 ${(0.15/2)-(0.042/2)} ${0.01/2}" rpy="0 0 0" />
+    </link>
+
+    <joint name="body_cover_joint" type="fixed">
+        <parent link="body_link" />
+        <child link="cover_link" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+
+    <joint name="body_shaft_joint" type="continuous">
+        <parent link="body_link" />
+        <child link="shaft_link" />
+        <origin xyz="0 0 0.027" rpy="0 0 0" />
+        <axis xyz="0 0 1" />
+    </joint>
+
+    <joint name="shaft_arm_joint" type="fixed">
+        <parent link="shaft_link" />
+        <child link="arm_link" />
+        <origin xyz="0 0 0.0035" rpy="0 0 0" />
+    </joint>
+</robot>

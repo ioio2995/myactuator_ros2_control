@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="myactuator_ros2_control_urdf">
+
+   <!-- Import MyActuator description -->
+   <xacro:include filename="$(find myactuator_description)/urdf/myactuator.urdf.xacro" />
+
+  <!-- Import ros2_control description -->
+  <xacro:include filename="$(find myactuator_ros2_control)/xacro/myactuator.ros2_control.xacro" />
+  <xacro:myactuator_ros2_control name="motor_controller" ifname="can0" />
+
+</robot>

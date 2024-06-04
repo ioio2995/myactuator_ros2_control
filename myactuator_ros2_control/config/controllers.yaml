@@ -1,0 +1,25 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100  # Hz
+    
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    motor_controller:
+      type: forward_command_controller/ForwardCommandController
+    
+    motor_broadcaster:
+      type: myactuator_controllers/MyActuatorBroadcaster
+    
+
+motor_controller:
+  ros__parameters:
+    joints:
+      - body_shaft_joint
+    interface_name: position
+
+motor_broadcaster:
+  ros__parameters:
+    interface_names.force.x: body_shaft_joint/effort
+    interface_names.torque.z: body_shaft_joint/effort
+    frame_id: shaft_link

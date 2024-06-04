@@ -4,8 +4,8 @@ This project provides a ROS 2 driver for the MyActuator RMD X-series servo motor
 
 ## Project Structure
 
-- **myactuator_demo_bringup**: Launch files for ROS 2 nodes.
-- **myactuator_demo_description**: URDF files for robot description.
+- **myactuator_bringup**: Launch files for ROS 2 nodes.
+- **myactuator_description**: URDF files for robot description.
 - **myactuator_hardware_interface**: Hardware interface implementation.
 
 ## Prerequisites
@@ -62,7 +62,7 @@ This project provides a ROS 2 driver for the MyActuator RMD X-series servo motor
 
 To launch the system:
 ```bash
-ros2 launch myactuator_demo_bringup bringup.launch.py
+ros2 launch myactuator_bringup bringup.launch.py
 ```
 
 ## License and Attribution
