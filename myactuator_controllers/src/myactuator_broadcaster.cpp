@@ -13,8 +13,15 @@ namespace myactuator_broadcaster
   {
     try
     {
-      param_listener_ = std::make_shared<ParamListener>(get_node());
-      params_ = param_listener_->get_params();
+        auto_declare<std::string>("sensor_name", "");
+        auto_declare<std::string>("interface_names.force.x", "");
+        auto_declare<std::string>("interface_names.force.y", "");
+        auto_declare<std::string>("interface_names.force.z", "");
+        auto_declare<std::string>("interface_names.torque.x", "");
+        auto_declare<std::string>("interface_names.torque.y", "");
+        auto_declare<std::string>("interface_names.torque.z", "");
+        auto_declare<std::string>("frame_id", "");
+        auto_declare<std::string>("topic_name", "");
     }
     catch (const std::exception &e)
     {
@@ -28,14 +35,18 @@ namespace myactuator_broadcaster
   controller_interface::CallbackReturn MyActuatorBroadcaster::on_configure(
       const rclcpp_lifecycle::State & /*previous_state*/)
   {
-    params_ = param_listener_->get_params();
+    sensor_name_ = get_node()->get_parameter("sensor_name").as_string();
+    interface_names_[0] = get_node()->get_parameter("interface_names.force.x").as_string();
+    interface_names_[1] = get_node()->get_parameter("interface_names.force.y").as_string();
+    interface_names_[2] = get_node()->get_parameter("interface_names.force.z").as_string();
+    interface_names_[3] = get_node()->get_parameter("interface_names.torque.x").as_string();
+    interface_names_[4] = get_node()->get_parameter("interface_names.torque.y").as_string();
+    interface_names_[5] = get_node()->get_parameter("interface_names.torque.z").as_string();
 
-    const bool no_interface_names_defined =
-        params_.interface_names.force.x.empty() && params_.interface_names.force.y.empty() &&
-        params_.interface_names.force.z.empty() && params_.interface_names.torque.x.empty() &&
-        params_.interface_names.torque.y.empty() && params_.interface_names.torque.z.empty();
+    const bool no_interface_names_defined
+        = std::count(interface_names_.begin(), interface_names_.end(), "") == 6;
 
-    if (params_.sensor_name.empty() && no_interface_names_defined)
+    if (sensor_name_.empty() && no_interface_names_defined)
     {
       RCLCPP_ERROR(
           get_node()->get_logger(),
@@ -44,7 +55,7 @@ namespace myactuator_broadcaster
       return controller_interface::CallbackReturn::ERROR;
     }
 
-    if (!params_.sensor_name.empty() && !no_interface_names_defined)
+    if (!sensor_name_.empty() && !no_interface_names_defined)
     {
       RCLCPP_ERROR(
           get_node()->get_logger(),
@@ -53,19 +64,17 @@ namespace myactuator_broadcaster
       return controller_interface::CallbackReturn::ERROR;
     }
 
-    if (!params_.sensor_name.empty())
+    if (!sensor_name_.empty())
     {
       myactuator_ = std::make_unique<semantic_components::ForceTorqueSensor>(
-          semantic_components::ForceTorqueSensor(params_.sensor_name));
+          semantic_components::ForceTorqueSensor(sensor_name_));
     }
     else
     {
-      auto const &force_names = params_.interface_names.force;
-      auto const &torque_names = params_.interface_names.torque;
       myactuator_ = std::make_unique<semantic_components::ForceTorqueSensor>(
-          semantic_components::ForceTorqueSensor(
-              force_names.x, force_names.y, force_names.z, torque_names.x, torque_names.y,
-              torque_names.z));
+            semantic_components::ForceTorqueSensor(interface_names_[0], interface_names_[1],
+                interface_names_[2], interface_names_[3], interface_names_[4],
+                interface_names_[5]));
     }
 
     try
@@ -84,7 +93,7 @@ namespace myactuator_broadcaster
     }
 
     realtime_publisher_->lock();
-    realtime_publisher_->msg_.header.frame_id = params_.frame_id;
+    realtime_publisher_->msg_.header.frame_id = frame_id_;
     realtime_publisher_->unlock();
 
     RCLCPP_DEBUG(get_node()->get_logger(), "configure successful");

@@ -9,7 +9,7 @@ controller_manager:
       type: forward_command_controller/ForwardCommandController
     
     motor_broadcaster:
-      type: myactuator_controllers/MyActuatorBroadcaster
+      type: myactuator_broadcaster/MyActuatorBroadcaster
     
 
 motor_controller:
