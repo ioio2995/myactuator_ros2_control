@@ -12,7 +12,7 @@
       </hardware>
 
       <joint name="body_shaft_joint">
-        <param name="can_id">4</param>
+        <param name="can_id">1</param>
         <param name="reducer_ratio">6.2</param>
         <param name="speed_constant">30</param>
         <param name="torque_constant">2.6</param>
