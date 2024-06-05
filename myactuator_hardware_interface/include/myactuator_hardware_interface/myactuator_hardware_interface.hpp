@@ -113,7 +113,6 @@ namespace myactuator_hardware_interface
     std::vector<double> hw_current_phase_a_;
     std::vector<double> hw_current_phase_b_;
     std::vector<double> hw_current_phase_c_;
-    std::vector<double> hw_brake_;
     std::vector<double> hw_motor_errors_;
     
     std::vector<std::uint32_t> motor_position_acceleration_;

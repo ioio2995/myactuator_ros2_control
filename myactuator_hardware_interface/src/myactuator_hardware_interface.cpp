@@ -22,12 +22,11 @@ namespace myactuator_hardware_interface
     hw_commands_efforts_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
     control_level_.resize(info_.joints.size(), integration_level_t::UNDEFINED);
 
-    hw_motor_temperature_.resize(info_.joints.size(), std::numeric_limits<std::uint16_t>::quiet_NaN());
+    hw_motor_temperature_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
     hw_voltage_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
     hw_current_phase_a_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
     hw_current_phase_b_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
     hw_current_phase_c_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-    hw_brake_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
     hw_motor_errors_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
     ifname_ = info_.hardware_parameters["ifname"];
@@ -148,8 +147,6 @@ namespace myactuator_hardware_interface
           info_.joints[i].name, "motor_phase_b_current", &hw_current_phase_b_[i]));
       state_interfaces.emplace_back(hardware_interface::StateInterface(
           info_.joints[i].name, "motor_phase_c_current", &hw_current_phase_c_[i]));
-      state_interfaces.emplace_back(hardware_interface::StateInterface(
-          info_.joints[i].name, "motor_brake", &hw_brake_[i]));
     }
     return state_interfaces;
   }
@@ -252,8 +249,8 @@ namespace myactuator_hardware_interface
       hw_states_positions_[i] = static_cast<double>(((MultiTurnAngle * M_PI) / 180));
       hw_states_efforts_[i] = static_cast<double>(MotorStatus_2.current * motor_torque_constant_[i]);
       hw_states_velocities_[i] = static_cast<double>((MotorStatus_2.shaft_speed * M_PI) / 180);
-      hw_motor_errors_[i] = static_cast<int>(MotorStatus_1.error_code);
-      hw_motor_temperature_[i] = MotorStatus_1.temperature;
+      hw_motor_errors_[i] = static_cast<double>(MotorStatus_1.error_code);
+      hw_motor_temperature_[i] = static_cast<double>(MotorStatus_1.temperature);
       hw_voltage_[i] = static_cast<double>(MotorStatus_1.voltage);
       hw_current_phase_a_[i] = static_cast<double>(MotorStatus_3.current_phase_a);
       hw_current_phase_b_[i] = static_cast<double>(MotorStatus_3.current_phase_b);
