@@ -30,7 +30,7 @@ def generate_launch_description():
     other_spawner_event_handler = RegisterEventHandler(
         event_handler=OnProcessExit(
             target_action=joint_state_broadcaster_spawner,
-            on_exit=[motor_controller_spawner],
+            on_exit=[motor_controller_spawner,motor_broadcaster_spawner],
         )
     )
 

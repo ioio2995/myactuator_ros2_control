@@ -9,7 +9,7 @@ controller_manager:
       type: forward_command_controller/ForwardCommandController
     
     motor_broadcaster:
-      type: myactuator_broadcaster/MyActuatorBroadcaster
+      type: myactuator_state_broadcaster/MyActuatorStateBroadcaster
     
 
 motor_controller:
@@ -17,9 +17,3 @@ motor_controller:
     joints:
       - body_shaft_joint
     interface_name: position
-
-motor_broadcaster:
-  ros__parameters:
-    interface_names.force.x: body_shaft_joint/effort
-    interface_names.torque.z: body_shaft_joint/effort
-    frame_id: shaft_link

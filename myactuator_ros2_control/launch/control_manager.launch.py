@@ -24,6 +24,7 @@ def generate_launch_description():
         executable="ros2_control_node",
         parameters=[params_file],
         output="both",
+        #arguments=['--ros-args', '--log-level', 'debug'],
         remappings=[
             ("~/robot_description", "/robot_description"),
         ]
